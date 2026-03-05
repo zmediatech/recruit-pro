@@ -2,14 +2,14 @@ const Candidate = require('../models/Candidate');
 const { calculateMetrics } = require('../services/metrics');
 
 // @route   POST /api/candidates/ingest
-// @desc    Ingest raw candidate data, process via Integration metrics, and store vector
+// @route   POST /api/candidates/:id/ingest
+// @desc    Ingest assessment data and update candidate profile
 const ingestCandidate = async (req, res) => {
     try {
-        const rawData = req.body;
-
-        // Ensure all required fields exist
+        const { id } = req.params;
         const {
             name,
+            positionApplied,
             fluidIntBaseline,
             ethicalBaseline,
             stressTelemetry,
@@ -17,64 +17,55 @@ const ingestCandidate = async (req, res) => {
             fluidIntStressed,
             ethicalStressed,
             evaluatorNotes,
-            stage,
-            scenarioSelection
+            stage
         } = req.body;
 
-        // Basic validation for required fields
-        if (!name || !fluidIntBaseline || !ethicalBaseline || !stressTelemetry || !noWinScore || !fluidIntStressed || !ethicalStressed) {
-            return res.status(400).json({ error: 'Missing required raw metrics for ingestion' });
+        // Basic validation
+        if (!name || fluidIntBaseline === undefined || ethicalBaseline === undefined) {
+            return res.status(400).json({ error: 'Missing required metrics for assessment ingestion' });
         }
-
-        // Implementation of the Stability Index (ρ)
-        // Formula: ρ = 1 - (((0.4 * Dx) + (0.6 * Dy)) / ΔZ)
 
         const Dx = fluidIntBaseline > 0 ? (fluidIntBaseline - (fluidIntStressed || fluidIntBaseline)) / fluidIntBaseline : 0;
         const Dy = ethicalBaseline > 0 ? (ethicalBaseline - (noWinScore || ethicalBaseline)) / ethicalBaseline : 0;
-        const deltaZ = (stressTelemetry || 100) / 100; // Normalized stress load
-
+        const deltaZ = (stressTelemetry || 100) / 100;
         const rho = Math.max(0, 1 - (((0.4 * Dx) + (0.6 * Dy)) / (deltaZ || 1)));
-
-        // Final Ethical Calculation biased towards No-Win scenarios
-        // Y_final = (Y_base_SJT * 0.3) + (Y_No_Win * 0.7)
         const Y_final = (ethicalBaseline * 0.3) + (noWinScore * 0.7);
 
-        const newCandidate = new Candidate({
+        const updateData = {
             name,
-            candidateId: `CID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+            positionApplied,
             coordinates: {
                 X: fluidIntStressed || fluidIntBaseline,
                 Y: Y_final,
                 Z: stressTelemetry
             },
-            baselineMetrics: {
-                X: fluidIntBaseline,
-                Y: ethicalBaseline
-            },
-            stressedMetrics: {
-                X: fluidIntStressed,
-                Y: noWinScore
-            },
+            baselineMetrics: { X: fluidIntBaseline, Y: ethicalBaseline },
+            stressedMetrics: { X: fluidIntStressed, Y: noWinScore },
             rho,
-            evaluatorNotes: evaluatorNotes || '',
-            scenarioSelection: scenarioSelection || 'None',
+            evaluatorNotes: evaluatorNotes || 'Assessment completed.',
             stage: stage || 'Evaluated',
             flags: []
-        });
+        };
 
-        // Red Flag Detection: Ethical Collapse
         if (ethicalBaseline > 80 && noWinScore < 30) {
-            newCandidate.flags.push("ETHICAL_COLLAPSE_DETECTED: Significant delta between baseline and high-stakes choice.");
+            updateData.flags.push("Notice: Significant delta between baseline and high-stakes choice.");
         }
 
-        // Store
-        await newCandidate.save();
+        let candidate;
+        if (id) {
+            candidate = await Candidate.findByIdAndUpdate(id, updateData, { new: true });
+        } else {
+            updateData.candidateId = `CID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+            candidate = new Candidate(updateData);
+            await candidate.save();
+        }
 
-        res.status(201).json(newCandidate);
+        if (!candidate) return res.status(404).json({ error: 'Candidate not found' });
+        res.status(200).json(candidate);
 
     } catch (err) {
         console.error("Ingestion Error:", err);
-        res.status(500).json({ error: 'Server Error during ingestion phase' });
+        res.status(500).json({ error: 'Server Error during assessment processing' });
     }
 };
 

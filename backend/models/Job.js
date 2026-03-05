@@ -6,10 +6,37 @@ const jobSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    locationType: {
+        type: String,
+        enum: ['In person', 'Remote', 'Hybrid'],
+        default: 'In person'
+    },
+    location: {
+        type: String,
+        trim: true
+    },
+    timeline: {
+        type: String,
+        trim: true
+    },
+    peopleToHire: {
+        type: Number,
+        default: 1
+    },
+    jobType: {
+        type: [String], // Can be multiple like Full-time + Temporary
+        default: ['Full-time']
+    },
+    pay: {
+        showBy: { type: String, default: 'Range' },
+        min: { type: Number },
+        max: { type: Number },
+        rate: { type: String, default: 'per hour' }
+    },
     department: {
         type: String,
-        required: true,
-        trim: true
+        trim: true,
+        default: 'General'
     },
     status: {
         type: String,

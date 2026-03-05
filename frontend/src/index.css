@@ -16,9 +16,22 @@
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 
+  /* Sidebar & Layout */
   --sidebar-width: 260px;
   --base-radius: 12px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Semantic SaaS Tokens (Dark Mode Defaults) */
+  --saas-bg-card: #111827;
+  --saas-border-card: rgba(255, 255, 255, 0.1);
+  --saas-text-heading: #ffffff;
+  --saas-text-body: #d1d5db;
+  --saas-text-helper: #9ca3af;
+  --saas-input-bg: #1f2937;
+  --saas-input-border: #374151;
+  --saas-input-text: #ffffff;
+  --saas-input-focus: #3b82f6;
+  --saas-btn-outline-hover: #1f2937;
 }
 
 [data-theme='light'] {
@@ -31,6 +44,18 @@
   --glass-bg: rgba(255, 255, 255, 0.9);
   --glass-border: rgba(0, 0, 0, 0.08);
   --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  /* Semantic SaaS Tokens (Light Mode) */
+  --saas-bg-card: #ffffff;
+  --saas-border-card: #e5e7eb;
+  --saas-text-heading: #111827;
+  --saas-text-body: #374151;
+  --saas-text-helper: #6b7280;
+  --saas-input-bg: #ffffff;
+  --saas-input-border: #e5e7eb;
+  --saas-input-text: #111827;
+  --saas-input-focus: #3b82f6;
+  --saas-btn-outline-hover: #f9fafb;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -279,4 +304,170 @@ h5 {
 
 .animate-fade {
   animation: fadeIn 0.4s ease forwards;
+}
+
+/* Modern SaaS Form Design System */
+.saas-card {
+  background: var(--saas-bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--saas-border-card);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 2.5rem;
+  color: var(--saas-text-body);
+}
+
+.saas-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--saas-text-body);
+  margin-bottom: 0.5rem;
+}
+
+.saas-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--saas-input-bg);
+  border: 1px solid var(--saas-input-border);
+  border-radius: 8px;
+  color: var(--saas-input-text);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.saas-input:focus {
+  border-color: var(--saas-input-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.saas-input::placeholder {
+  color: var(--saas-text-helper);
+}
+
+.saas-helper {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--saas-text-helper);
+}
+
+.saas-btn-primary {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.saas-btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.saas-btn-outline {
+  background: transparent;
+  color: var(--saas-text-body);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 1px solid var(--saas-border-card);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saas-btn-outline:hover {
+  background: var(--saas-btn-outline-hover);
+  border-color: var(--saas-text-helper);
+}
+
+/* Responsive Grid Utilities */
+.saas-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .saas-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Modern Step Indicator */
+.step-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.step-container::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #f3f4f6;
+  z-index: 1;
+}
+
+.step-item {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+}
+
+.step-item.active .step-circle {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.step-item.completed .step-circle {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.step-item.active .step-label {
+  color: #3b82f6;
+}
+
+.step-item.completed .step-label {
+  color: #374151;
 }

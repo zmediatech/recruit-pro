@@ -9,6 +9,7 @@ import CVUpload from './pages/CVUpload';
 import Settings from './pages/Settings';
 import IntakeGateway from './pages/IntakeGateway';
 import JobManager from './pages/JobManager';
+import JobDetail from './pages/JobDetail';
 import TechnicalAssessment from './pages/TechnicalAssessment';
 import GauntletPortal from './pages/GauntletPortal';
 import { ThemeProvider } from './context/ThemeContext';
@@ -31,6 +32,7 @@ function App() {
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/intake" element={<IntakeGateway />} />
                             <Route path="/jobs" element={<JobManager />} />
+                            <Route path="/jobs/:id" element={<JobDetail />} />
                             {/* Automated Assessment Portal */}
                             <Route path="/assess" element={<AssessmentLauncher />} />
                             {/* CV Intelligence Uplink */}

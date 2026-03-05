@@ -6,11 +6,12 @@ import {
     FileText,
     CheckCircle,
     RefreshCcw,
-    ShieldCheck,
     Zap,
     Terminal,
     FileSearch,
-    ArrowRight
+    ArrowRight,
+    FileUp,
+    CheckCircle2
 } from 'lucide-react';
 
 export default function CVUpload() {
@@ -23,14 +24,12 @@ export default function CVUpload() {
         const selected = e.target.files[0];
         if (selected) {
             setFile(selected);
-            setReport(null); // Clear previous analysis results
+            setReport(null);
         }
     };
 
     const startAnalysis = () => {
         setAnalyzing(true);
-
-        // Simulation Profiles Pool
         const profiles = {
             technical: {
                 confidenceScore: 94,
@@ -45,36 +44,15 @@ export default function CVUpload() {
                 experience: "Strategic leader with a proven track record of managing multi-million dollar software projects.",
                 education: "MBA / B.S. in Information Systems",
                 summary: "Highly organized manager with strong communication skills and business acumen."
-            },
-            sales: {
-                confidenceScore: 85,
-                skills: ["Account Management", "B2B Sales", "Client Relations", "Market Analysis", "Public Speaking"],
-                experience: "Top-performing sales executive with experience in international markets and high-ticket closing.",
-                education: "B.A. in Marketing / Business Administration",
-                summary: "Aggressive sales professional with a focus on client satisfaction and revenue growth."
-            },
-            junior: {
-                confidenceScore: 91,
-                skills: ["JavaScript", "HTML/CSS", "React Basics", "Git Version Control", "Python Fundamentals"],
-                experience: "Recent graduate with strong internship experience and high potential for rapid technical growth.",
-                education: "B.S. in Computer Science (New Graduate)",
-                summary: "Eager and talented junior developer with a solid foundation in modern web technologies."
             }
         };
 
-        // Keyword Detection Logic
         setTimeout(() => {
             const fileName = file.name.toLowerCase();
-            let selectedProfile = profiles.technical; // Default
-
-            if (fileName.includes('manager') || fileName.includes('lead') || fileName.includes('management')) {
+            let selectedProfile = profiles.technical;
+            if (fileName.includes('manager') || fileName.includes('lead')) {
                 selectedProfile = profiles.management;
-            } else if (fileName.includes('sales') || fileName.includes('market') || fileName.includes('business')) {
-                selectedProfile = profiles.sales;
-            } else if (fileName.includes('junior') || fileName.includes('jr') || fileName.includes('intern')) {
-                selectedProfile = profiles.junior;
             }
-
             setReport({
                 name: file.name.split('.')[0].toUpperCase(),
                 ...selectedProfile
@@ -84,10 +62,17 @@ export default function CVUpload() {
     };
 
     return (
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ maxWidth: 900, margin: '4rem auto', padding: '0 1rem' }}>
             <header style={{ marginBottom: '3rem' }}>
-                <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>RESUME ANALYSIS</h1>
-                <p style={{ color: 'var(--text-secondary)' }}>Extracting professional skills and experience from the document.</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                    <div style={{ padding: '0.75rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '10px', color: '#3b82f6' }}>
+                        <FileSearch size={24} />
+                    </div>
+                    <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--saas-text-heading)' }}>Intelligence Uplink</h1>
+                </div>
+                <p style={{ color: 'var(--saas-text-helper)', fontSize: '1rem' }}>
+                    Upload professional resumes for automated skill extraction and cognitive profiling.
+                </p>
             </header>
 
             <AnimatePresence mode="wait">
@@ -97,30 +82,31 @@ export default function CVUpload() {
                         initial={{ opacity: 0, scale: 0.98 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 1.02 }}
-                        className="glass-panel"
+                        className="saas-card"
                         style={{
-                            padding: '4rem 2rem',
+                            padding: '5rem 2rem',
                             textAlign: 'center',
-                            border: '2px dashed var(--glass-border)',
+                            borderStyle: 'dashed',
                             background: 'var(--bg-subtle)'
                         }}
                     >
-                        <div style={{ marginBottom: '2rem' }}>
+                        <div style={{ marginBottom: '2.5rem' }}>
                             <div style={{
                                 width: 80,
                                 height: 80,
                                 borderRadius: '50%',
-                                background: 'rgba(59, 130, 246, 0.1)',
+                                background: 'var(--bg-secondary)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 margin: '0 auto 1.5rem',
-                                border: '1px solid var(--accent-blue)'
+                                border: '1px solid var(--saas-border-card)',
+                                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
                             }}>
-                                <UploadCloud size={40} color="var(--accent-blue)" />
+                                <UploadCloud size={32} color="#3b82f6" />
                             </div>
-                            <h3 style={{ marginBottom: '1rem' }}>UPLOAD CANDIDATE RESUME</h3>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Accepts .PDF, .DOCX, or .TXT formats.</p>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--saas-text-heading)', marginBottom: '0.75rem' }}>Select Document</h3>
+                            <p style={{ color: 'var(--saas-text-helper)', fontSize: '0.875rem' }}>PDF, DOCX, or TXT formats accepted.</p>
                         </div>
 
                         <input
@@ -135,32 +121,32 @@ export default function CVUpload() {
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
                                 {file && (
                                     <div style={{
-                                        padding: '1rem 2rem',
+                                        padding: '0.75rem 1.5rem',
                                         background: 'rgba(16, 185, 129, 0.1)',
-                                        borderRadius: '12px',
-                                        border: '1px solid var(--accent-green)',
+                                        borderRadius: '8px',
+                                        border: '1px solid #10b981',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '1rem'
+                                        gap: '0.75rem'
                                     }}>
-                                        <FileText size={20} color="var(--accent-green)" />
-                                        <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{file.name}</span>
+                                        <FileText size={18} color="#10b981" />
+                                        <span style={{ fontWeight: 600, color: 'var(--accent-green)', fontSize: '0.875rem' }}>{file.name}</span>
                                     </div>
                                 )}
 
                                 <div style={{ display: 'flex', gap: '1rem' }}>
                                     <button
-                                        className="btn btn-outline"
+                                        className="saas-btn-outline"
                                         onClick={() => document.getElementById('cv-input').click()}
                                     >
-                                        SELECT FILE
+                                        CHOOSE FILE
                                     </button>
                                     {file && (
                                         <button
-                                            className="btn btn-primary"
+                                            className="saas-btn-primary"
                                             onClick={startAnalysis}
                                         >
-                                            INITIALIZE SCAN <Zap size={18} />
+                                            INITIALIZE ANALYSIS <Zap size={18} />
                                         </button>
                                     )}
                                 </div>
@@ -170,26 +156,26 @@ export default function CVUpload() {
                                 <motion.div
                                     animate={{ rotate: 360 }}
                                     transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                                    style={{ marginBottom: '2rem' }}
+                                    style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}
                                 >
-                                    <RefreshCcw size={40} color="var(--accent-blue)" />
+                                    <RefreshCcw size={48} color="#3b82f6" />
                                 </motion.div>
-                                <div style={{ fontFamily: 'sans-serif', color: 'var(--accent-blue)', letterSpacing: '1px' }}>
-                                    ANALYZING RESUME DATA...
+                                <div style={{ fontWeight: 700, color: '#3b82f6', letterSpacing: '0.05em' }}>
+                                    PARSING RECURSIVE DATA STRUCTURES...
                                 </div>
                                 <div style={{
-                                    width: '200px',
-                                    height: '4px',
-                                    background: 'var(--border-subtle)',
-                                    margin: '1.5rem auto',
-                                    borderRadius: '2px',
+                                    width: '240px',
+                                    height: '6px',
+                                    background: 'var(--saas-border-card)',
+                                    margin: '2rem auto',
+                                    borderRadius: '3px',
                                     overflow: 'hidden'
                                 }}>
                                     <motion.div
                                         initial={{ x: '-100%' }}
                                         animate={{ x: '100%' }}
                                         transition={{ repeat: Infinity, duration: 1.5 }}
-                                        style={{ width: '100%', height: '100%', background: 'var(--accent-blue)' }}
+                                        style={{ width: '100%', height: '100%', background: '#3b82f6' }}
                                     />
                                 </div>
                             </div>
@@ -200,111 +186,91 @@ export default function CVUpload() {
                         key="report"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="glass-panel"
+                        className="saas-card"
+                        style={{ padding: '0', overflow: 'hidden' }}
                     >
-                        {/* Demo Mode Banner */}
-                        <div style={{
-                            background: 'rgba(59, 130, 246, 0.1)',
-                            border: '1px solid var(--accent-blue)',
-                            padding: '0.75rem',
-                            borderRadius: '12px',
-                            marginBottom: '2rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '1rem'
-                        }}>
-                            <Terminal size={18} color="var(--accent-blue)" />
-                            <span style={{ fontSize: '0.8rem', color: 'var(--accent-blue)', fontWeight: 800, letterSpacing: '1px' }}>
-                                VISUAL DEMONSTRATION: RESULTS ARE CURRENTLY SIMULATED
-                            </span>
-                        </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-                            <div>
-                                <h2 style={{ color: 'var(--accent-blue)', marginBottom: '0.5rem' }}>ANALYSIS RESULTS: {report.name}</h2>
-                                <div className="status-badge status-valid">PROFILE VERIFIED</div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <p style={{ color: 'var(--text-secondary)', fontSize: '0.7rem' }}>CONFIDENCE SCORE</p>
-                                <h1 style={{ color: 'var(--accent-green)', letterSpacing: '3px' }}>{report.confidenceScore}%</h1>
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '3rem' }}>
-                            <div>
-                                <h4 style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>KEY SKILLS</h4>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                    {report.skills.map((s, i) => (
-                                        <div key={i} style={{
-                                            padding: '0.6rem 1rem',
-                                            background: 'var(--bg-subtle)',
-                                            borderRadius: '8px',
-                                            fontSize: '0.75rem',
-                                            border: '1px solid var(--glass-border)'
-                                        }}>
-                                            {s}
-                                        </div>
-                                    ))}
+                        <div style={{ background: 'var(--bg-secondary)', padding: '2.5rem 3rem', borderBottom: '1px solid var(--saas-border-card)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--saas-text-helper)', textTransform: 'uppercase' }}>Extraction Report</span>
+                                        <CheckCircle2 size={14} color="#10b981" />
+                                    </div>
+                                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--saas-text-heading)' }}>{report.name}</h2>
                                 </div>
-                            </div>
-                            <div>
-                                <h4 style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>EDUCATIONAL DETAILS</h4>
-                                <div style={{
-                                    padding: '1rem',
-                                    background: 'var(--bg-subtle)',
-                                    borderRadius: '12px',
-                                    fontSize: '0.85rem',
-                                    color: 'var(--text-primary)',
-                                    border: '1px solid var(--glass-border)'
-                                }}>
-                                    {report.education}
+                                <div style={{ textAlign: 'right' }}>
+                                    <p style={{ color: 'var(--saas-text-helper)', fontSize: '0.75rem', fontWeight: 700 }}>MATCH CONFIDENCE</p>
+                                    <h1 style={{ color: '#3b82f6', fontSize: '2.5rem', fontWeight: 900 }}>{report.confidenceScore}%</h1>
                                 </div>
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: '2.5rem' }}>
-                            <h4 style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>PROFESSIONAL EXPERIENCE</h4>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', lineHeight: 1.6 }}>{report.experience}</p>
+                        <div style={{ padding: '3rem' }}>
+                            <div className="saas-grid saas-grid-2" style={{ marginBottom: '3rem' }}>
+                                <div>
+                                    <h4 className="saas-label" style={{ borderBottom: '1px solid var(--saas-border-card)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Extracted Skills</h4>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                        {report.skills.map((s, i) => (
+                                            <div key={i} style={{
+                                                padding: '0.5rem 0.875rem',
+                                                background: 'var(--bg-subtle)',
+                                                borderRadius: '6px',
+                                                fontSize: '0.8125rem',
+                                                border: '1px solid var(--saas-border-card)',
+                                                color: 'var(--saas-text-body)',
+                                                fontWeight: 600
+                                            }}>
+                                                {s}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="saas-label" style={{ borderBottom: '1px solid var(--saas-border-card)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Academic Context</h4>
+                                    <div style={{
+                                        padding: '1rem',
+                                        background: 'var(--bg-subtle)',
+                                        borderRadius: '8px',
+                                        border: '1px solid var(--saas-border-card)',
+                                        fontSize: '0.875rem',
+                                        lineHeight: 1.6
+                                    }}>
+                                        {report.education}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: '3rem' }}>
+                                <h4 className="saas-label" style={{ borderBottom: '1px solid var(--saas-border-card)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Professional Trajectory</h4>
+                                <p style={{ fontSize: '1rem', color: 'var(--saas-text-body)', lineHeight: 1.6 }}>{report.experience}</p>
+                            </div>
+
+                            <div style={{
+                                padding: '1.5rem 2rem',
+                                background: 'rgba(59, 130, 246, 0.1)',
+                                borderRadius: '12px',
+                                borderLeft: '4px solid #3b82f6',
+                                marginBottom: '4rem'
+                            }}>
+                                <h4 style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--accent-blue)', marginBottom: '0.5rem' }}>AI Summary Synthesis</h4>
+                                <p style={{ fontSize: '0.9375rem', color: 'var(--saas-text-body)', lineHeight: 1.6 }}>{report.summary}</p>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button className="saas-btn-outline" onClick={() => { setReport(null); setFile(null); }}>
+                                    <RefreshCcw size={18} /> NEW UPLOAD
+                                </button>
+                                <button className="saas-btn-primary" onClick={() => navigate('/')}>
+                                    RETURN TO DASHBOARD <ArrowRight size={18} />
+                                </button>
+                            </div>
                         </div>
 
-                        <div style={{
-                            padding: '1.5rem',
-                            background: 'rgba(59, 130, 246, 0.05)',
-                            borderRadius: '12px',
-                            borderLeft: '4px solid var(--accent-blue)',
-                            marginBottom: '2rem'
-                        }}>
-                            <h4 style={{ fontSize: '0.8rem', marginBottom: '0.5rem', color: 'var(--accent-blue)' }}>SUMMARY EVALUATION</h4>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', lineHeight: 1.6 }}>{report.summary}</p>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <button className="btn btn-outline" onClick={() => { setReport(null); setFile(null); }}>
-                                <RefreshCcw size={18} /> SCAN NEW RESUME
-                            </button>
-                            <button className="btn btn-primary" onClick={() => navigate('/')}>
-                                VIEW DASHBOARD <ArrowRight size={18} />
-                            </button>
-                        </div>
-
-                        {/* Simulation Disclaimer */}
-                        <div style={{
-                            marginTop: '2.5rem',
-                            padding: '1rem',
-                            border: '1px solid var(--border-subtle)',
-                            borderRadius: '8px',
-                            background: 'var(--bg-subtle)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '0.5rem',
-                            opacity: 0.6
-                        }}>
-                            <Terminal size={14} color="var(--accent-blue)" />
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>
-                                DEMO MODE: Analysis logic is currently simulated for user interface demonstration.
-                            </span>
+                        {/* Banner for simulated results */}
+                        <div style={{ padding: '1rem', background: 'var(--bg-secondary)', borderTop: '1px solid var(--saas-border-card)', textAlign: 'center' }}>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--saas-text-helper)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                <Terminal size={14} /> DEMONSTRATION MODE: DATA SYNTHESIS IS CURRENTLY SIMULATED
+                            </p>
                         </div>
                     </motion.div>
                 )}

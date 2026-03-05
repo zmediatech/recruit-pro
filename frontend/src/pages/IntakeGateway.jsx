@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     User,
@@ -12,7 +12,8 @@ import {
     Video,
     CheckCircle,
     ArrowRight,
-    Loader2
+    Loader2,
+    FileText
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -22,6 +23,7 @@ export default function IntakeGateway() {
     const [submitted, setSubmitted] = useState(false);
     const [candidateId, setCandidateId] = useState('');
 
+    const [jobs, setJobs] = useState([]);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -33,6 +35,21 @@ export default function IntakeGateway() {
         cvFile: null,
         videoFile: null
     });
+
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const res = await axios.get('http://localhost:5001/api/jobs');
+                setJobs(res.data);
+                if (res.data.length > 0) {
+                    setFormData(prev => ({ ...prev, positionApplied: res.data[0].title }));
+                }
+            } catch (err) {
+                console.error("Failed to fetch jobs:", err);
+            }
+        };
+        fetchJobs();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -48,9 +65,6 @@ export default function IntakeGateway() {
         setLoading(true);
 
         try {
-            // Note: In a production environment with real file uploads, 
-            // we would use FormData and a library like multer on the server.
-            // For this orchestration, we'll send the metadata to the intake endpoint.
             const response = await axios.post('http://localhost:5001/api/candidates/intake', {
                 ...formData,
                 cvUrl: formData.cvFile ? `uploads/cvs/${formData.cvFile.name}` : '',
@@ -63,7 +77,6 @@ export default function IntakeGateway() {
             }
         } catch (err) {
             console.error("Intake Submission Failed:", err);
-            // Fallback for demo if backend is unreachable
             const simulatedId = `CP-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
             setCandidateId(simulatedId);
             setSubmitted(true);
@@ -74,116 +87,140 @@ export default function IntakeGateway() {
 
     if (submitted) {
         return (
-            <div style={{ maxWidth: 600, margin: '4rem auto', textAlign: 'center' }}>
+            <div style={{ maxWidth: 600, margin: '6rem auto' }}>
                 <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
+                    initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="glass-panel"
-                    style={{ padding: '4rem' }}
+                    className="saas-card"
+                    style={{ textAlign: 'center', padding: '4rem' }}
                 >
-                    <CheckCircle size={80} color="var(--accent-green)" style={{ margin: '0 auto 2rem' }} />
-                    <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Success!</h1>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-                        Your application has been received. We will review your profile shortly.
-                    </p>
-                    <div style={{
-                        background: 'var(--bg-subtle)',
-                        padding: '1.5rem',
-                        borderRadius: '12px',
-                        border: '1px solid var(--glass-border)',
-                        marginBottom: '3rem'
-                    }}>
-                        <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Your Reference ID</p>
-                        <h2 style={{ fontFamily: 'JetBrains Mono', letterSpacing: '2px', color: 'var(--accent-blue)' }}>{candidateId}</h2>
+                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem' }}>
+                        <CheckCircle size={48} color="#10b981" />
                     </div>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                        You will receive an email once we have processed your information.
+                    <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--saas-text-heading)' }}>Application Submitted</h1>
+                    <p style={{ color: '#6b7280', fontSize: '1rem', marginBottom: '2.5rem' }}>
+                        Thank you for your interest. Our AI orchestration engine is now reviewing your profile.
                     </p>
+
+                    <div style={{ background: 'var(--bg-subtle)', padding: '2rem', borderRadius: '12px', border: '1px solid var(--saas-border-card)', marginBottom: '2rem' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--saas-text-helper)', textTransform: 'uppercase', letterSpacing: '1px' }}>Your Candidate ID</span>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '0.5rem', color: '#3b82f6', letterSpacing: '1px' }}>{candidateId}</h2>
+                    </div>
+
+                    <p style={{ fontSize: '0.875rem', color: '#9ca3af' }}>Please save this ID for future reference.</p>
                 </motion.div>
             </div>
         );
     }
 
     return (
-        <div style={{ maxWidth: 800, margin: '2rem auto' }}>
-            <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: 800, letterSpacing: '1px', marginBottom: '0.5rem' }}>RECRUITPRO</div>
-                <h1 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '0.5rem' }}>Application Form</h1>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Apply for open positions and join our talent network.</p>
+        <div style={{ maxWidth: 900, margin: '4rem auto' }}>
+            <header style={{ marginBottom: '4rem', textAlign: 'center' }}>
+                <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '0.75rem', color: 'var(--saas-text-heading)' }}>Join the Talent Network</h1>
+                <p style={{ color: 'var(--saas-text-helper)', fontSize: '1.1rem' }}>Submit your details to enter our automated orchestration and evaluation flow.</p>
             </header>
 
-            <form onSubmit={handleSubmit} className="glass-panel" style={{ padding: '3.5rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
-                    <IntakeField label="Full Name" icon={<User size={18} />}>
-                        <input type="text" name="name" required className="form-control" value={formData.name} onChange={handleChange} placeholder="e.g. John Doe" />
-                    </IntakeField>
-
-                    <IntakeField label="Email Address" icon={<Mail size={18} />}>
-                        <input type="email" name="email" required className="form-control" value={formData.email} onChange={handleChange} placeholder="e.g. john@example.com" />
-                    </IntakeField>
-
-                    <IntakeField label="Phone Number" icon={<Phone size={18} />}>
-                        <input type="tel" name="phone" required className="form-control" value={formData.phone} onChange={handleChange} placeholder="e.g. +1 234 567 890" />
-                    </IntakeField>
-
-                    <IntakeField label="National ID / CNIC" icon={<CreditCard size={18} />}>
-                        <input type="text" name="cnic" required className="form-control" value={formData.cnic} onChange={handleChange} placeholder="e.g. 00000-0000000-0" />
-                    </IntakeField>
-
-                    <IntakeField label="Expected Salary" icon={<DollarSign size={18} />}>
-                        <input type="number" name="expectedSalary" required className="form-control" value={formData.expectedSalary} onChange={handleChange} placeholder="Monthly Gross" />
-                    </IntakeField>
-
-                    <IntakeField label="Position Applied" icon={<Briefcase size={18} />}>
-                        <input type="text" name="positionApplied" required className="form-control" value={formData.positionApplied} onChange={handleChange} placeholder="e.g. Software Engineer" />
-                    </IntakeField>
-
-                    <div style={{ gridColumn: 'span 2' }}>
-                        <IntakeField label="Interview Availability" icon={<Calendar size={18} />}>
-                            <input type="text" name="availability" required className="form-control" value={formData.availability} onChange={handleChange} placeholder="e.g. Weekdays after 4 PM" />
-                        </IntakeField>
+            <form onSubmit={handleSubmit} className="saas-card">
+                <div className="saas-grid saas-grid-2" style={{ marginBottom: '2.5rem' }}>
+                    <div className="form-group">
+                        <label className="saas-label">Full Name</label>
+                        <input type="text" name="name" required className="saas-input" value={formData.name} onChange={handleChange} placeholder="e.g. Hammad Malik" />
                     </div>
 
-                    <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '2rem' }}>
-                        <div>
-                            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '1rem' }}>Upload CV (PDF/DOCX)</label>
-                            <label className="btn btn-outline" style={{ display: 'flex', width: '100%', cursor: 'pointer', height: '100px', flexDirection: 'column', gap: '0.5rem', borderStyle: 'dashed' }}>
-                                <UploadCloud size={20} color="var(--accent-blue)" />
-                                <span style={{ fontSize: '0.8rem' }}>{formData.cvFile ? formData.cvFile.name : 'Click to select file'}</span>
-                                <input type="file" hidden accept=".pdf,.docx" onChange={(e) => handleFileChange(e, 'cvFile')} />
-                            </label>
-                        </div>
-                        <div>
-                            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '1rem' }}>Introduction Video</label>
-                            <label className="btn btn-outline" style={{ display: 'flex', width: '100%', cursor: 'pointer', height: '100px', flexDirection: 'column', gap: '0.5rem', borderStyle: 'dashed' }}>
-                                <Video size={20} color="var(--accent-purple)" />
-                                <span style={{ fontSize: '0.8rem' }}>{formData.videoFile ? formData.videoFile.name : 'Click to select file'}</span>
-                                <input type="file" hidden accept="video/*" onChange={(e) => handleFileChange(e, 'videoFile')} />
-                            </label>
-                        </div>
+                    <div className="form-group">
+                        <label className="saas-label">Email Address</label>
+                        <input type="email" name="email" required className="saas-input" value={formData.email} onChange={handleChange} placeholder="e.g. hammad@example.com" />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="saas-label">Phone Number</label>
+                        <input type="tel" name="phone" required className="saas-input" value={formData.phone} onChange={handleChange} placeholder="e.g. +92 300 0000000" />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="saas-label">CNIC / National ID</label>
+                        <input type="text" name="cnic" required className="saas-input" value={formData.cnic} onChange={handleChange} placeholder="e.g. 61101-0000000-0" />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="saas-label">Target Position</label>
+                        <select name="positionApplied" required className="saas-input" value={formData.positionApplied} onChange={handleChange}>
+                            {jobs.length === 0 ? (
+                                <option value="">No positions available</option>
+                            ) : (
+                                jobs.map(j => (
+                                    <option key={j._id} value={j.title}>{j.title}</option>
+                                ))
+                            )}
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="saas-label">Expected Salary (PKR Monthly)</label>
+                        <input type="number" name="expectedSalary" required className="saas-input" value={formData.expectedSalary} onChange={handleChange} placeholder="e.g. 120000" />
+                    </div>
+
+                    <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                        <label className="saas-label">Availability for Interview</label>
+                        <input type="text" name="availability" required className="saas-input" value={formData.availability} onChange={handleChange} placeholder="e.g. Weekdays after 2:00 PM" />
+                    </div>
+                </div>
+
+                <div className="saas-grid saas-grid-2" style={{ marginBottom: '3rem' }}>
+                    <div className="form-group">
+                        <label className="saas-label">Professional Resume (PDF/DOCX)</label>
+                        <label style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '2rem',
+                            border: '2px dashed var(--saas-border-card)',
+                            borderRadius: '12px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            background: 'var(--bg-subtle)'
+                        }} onMouseOver={e => e.currentTarget.style.borderColor = '#3b82f6'} onMouseOut={e => e.currentTarget.style.borderColor = 'var(--saas-border-card)'}>
+                            <UploadCloud size={32} color="#3b82f6" />
+                            <span style={{ fontSize: '0.875rem', color: '#6b7280', textAlign: 'center' }}>
+                                {formData.cvFile ? formData.cvFile.name : 'Click to upload resume'}
+                            </span>
+                            <input type="file" hidden accept=".pdf,.docx" onChange={(e) => handleFileChange(e, 'cvFile')} />
+                        </label>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="saas-label">Introduction Video (Optional)</label>
+                        <label style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '2rem',
+                            border: '2px dashed var(--saas-border-card)',
+                            borderRadius: '12px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            background: 'var(--bg-subtle)'
+                        }} onMouseOver={e => e.currentTarget.style.borderColor = '#8b5cf6'} onMouseOut={e => e.currentTarget.style.borderColor = 'var(--saas-border-card)'}>
+                            <Video size={32} color="#8b5cf6" />
+                            <span style={{ fontSize: '0.875rem', color: '#6b7280', textAlign: 'center' }}>
+                                {formData.videoFile ? formData.videoFile.name : 'Click to upload video'}
+                            </span>
+                            <input type="file" hidden accept="video/*" onChange={(e) => handleFileChange(e, 'videoFile')} />
+                        </label>
                     </div>
                 </div>
 
                 <button
                     type="submit"
-                    className="btn btn-primary"
+                    className="saas-btn-primary"
                     disabled={loading}
-                    style={{ width: '100%', height: '60px', marginTop: '3rem', fontSize: '1rem' }}
+                    style={{ width: '100%', height: '56px', fontSize: '1.1rem', justifyContent: 'center' }}
                 >
-                    {loading ? <><Loader2 className="spinning" size={20} /> Submitting...</> : <>Submit Application <ArrowRight size={20} /></>}
+                    {loading ? <Loader2 className="spinning" size={20} /> : <>SUBMIT APPLICATION <ArrowRight size={20} /></>}
                 </button>
             </form>
-        </div>
-    );
-}
-
-function IntakeField({ label, icon, children }) {
-    return (
-        <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-secondary)', letterSpacing: '1px', marginBottom: '0.75rem' }}>
-                {icon} {label}
-            </label>
-            {children}
         </div>
     );
 }
