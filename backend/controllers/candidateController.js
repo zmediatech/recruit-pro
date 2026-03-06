@@ -73,7 +73,20 @@ const ingestCandidate = async (req, res) => {
 // @desc    Candidate self-intake gateway
 const intakeCandidate = async (req, res) => {
     try {
-        const { name, email, phone, cnic, expectedSalary, positionApplied, availability, cvUrl, videoUrl } = req.body;
+        const {
+            name,
+            email,
+            phone,
+            cnic,
+            expectedSalary,
+            positionApplied,
+            location,
+            linkedin,
+            portfolio,
+            availability,
+            cvUrl,
+            videoUrl
+        } = req.body;
 
         const candidateId = `CP-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
@@ -85,25 +98,26 @@ const intakeCandidate = async (req, res) => {
             cnic,
             expectedSalary,
             positionApplied,
+            location,
+            linkedin,
+            portfolio,
             availability,
             cvUrl: cvUrl || '',
             videoUrl: videoUrl || '',
             stage: 'Intake',
             telemetryLogs: [{
-                action: 'INITIAL_INTAKE_SUBMISSION',
-                payload: { timestamp: new Date(), source: 'IntakeGateway' }
+                action: 'INITIAL_PORTAL_SUBMISSION',
+                payload: { timestamp: new Date(), source: 'CandidatePortal' }
             }]
         });
 
         await candidate.save();
 
-        // Trigger telemetry log artifact
-        console.log(`TELEMETRY LOG: Candidate ${candidate.candidateId} intake finalized.`);
-
         res.status(201).json({
             success: true,
+            id: candidate._id,
             candidateId: candidate.candidateId,
-            message: 'Candidate intake successful. Interview workflow triggered.'
+            message: 'Candidate intake successful.'
         });
     } catch (err) {
         console.error("Intake Error:", err);
@@ -175,4 +189,49 @@ const performCVAnalysis = async (req, res) => {
     }
 };
 
-module.exports = { ingestCandidate, getAllCandidates, getCandidateById, intakeCandidate, performCVAnalysis };
+const XLSX = require('xlsx');
+
+// @route   GET /api/admin/export
+// @desc    Export candidate data to Excel
+const exportCandidates = async (req, res) => {
+    try {
+        const candidates = await Candidate.find().lean();
+
+        const data = candidates.map(c => ({
+            'Candidate ID': c.candidateId,
+            'Name': c.name,
+            'Email': c.email,
+            'Phone': c.phone,
+            'Role': c.positionApplied,
+            'Location': c.location || 'N/A',
+            'Intelligence (X)': c.coordinates?.X || 0,
+            'Ethics (Y)': c.coordinates?.Y || 0,
+            'Resilience (Z)': c.coordinates?.Z || 0,
+            'Pressure Coeff (ρ)': c.rho || 1,
+            'Stage': c.stage,
+            'Created At': new Date(c.createdAt).toLocaleString()
+        }));
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(data);
+        XLSX.utils.book_append_sheet(wb, ws, 'Candidates');
+
+        const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=RecruitPro_Candidates_Export.xlsx');
+        res.send(buffer);
+    } catch (err) {
+        console.error("Export Error:", err);
+        res.status(500).json({ error: 'Failed to generate Excel export.' });
+    }
+};
+
+module.exports = {
+    ingestCandidate,
+    getAllCandidates,
+    getCandidateById,
+    intakeCandidate,
+    performCVAnalysis,
+    exportCandidates
+};

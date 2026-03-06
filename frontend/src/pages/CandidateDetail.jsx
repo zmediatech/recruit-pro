@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowLeft, ShieldCheck, Zap, Activity, Terminal, ExternalLink, Cpu, Play } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ShieldCheck, Zap, Activity, Terminal, ExternalLink, Cpu, Play, Linkedin } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 
@@ -79,10 +79,22 @@ export default function CandidateDetail() {
                         CANDIDATE PROFILE
                     </div>
                     <h1 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '0.5rem' }}>{name}</h1>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                         <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontFamily: 'JetBrains Mono' }}>ID: {id.slice(-8).toUpperCase()}</span>
                         <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--glass-border)' }} />
                         <span style={{ fontSize: '0.8rem', color: 'var(--accent-blue)', fontWeight: 700 }}>{stage?.toUpperCase() || 'EVALUATED'}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        {candidate.linkedin && (
+                            <a href={candidate.linkedin} target="_blank" rel="noreferrer" className="btn btn-outline" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
+                                <Linkedin size={14} /> LINKEDIN
+                            </a>
+                        )}
+                        {candidate.portfolio && (
+                            <a href={candidate.portfolio} target="_blank" rel="noreferrer" className="btn btn-outline" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
+                                <ExternalLink size={14} /> PORTFOLIO
+                            </a>
+                        )}
                     </div>
                 </div>
                 <div className={`status-badge ${isRejected ? 'status-rejected' : 'status-valid'}`} style={{ padding: '0.75rem 2rem' }}>
@@ -212,6 +224,25 @@ export default function CandidateDetail() {
                             >
                                 ANALYZE WITH AI
                             </button>
+                        )}
+                    </div>
+
+                    <div className="glass-panel">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                            <Terminal size={18} color="var(--accent-green)" />
+                            <h3 style={{ fontSize: '1rem' }}>Technical Assessment</h3>
+                        </div>
+                        {candidate.technicalAssessment?.questions?.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                {candidate.technicalAssessment.questions.map((q, i) => (
+                                    <div key={i} style={{ padding: '1rem', background: 'var(--bg-subtle)', borderRadius: '8px', borderLeft: '4px solid var(--accent-blue)' }}>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.5rem' }}>{q.question}</p>
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>"{q.answer}"</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>No technical responses recorded yet.</p>
                         )}
                     </div>
 

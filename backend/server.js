@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const candidateRoutes = require('./routes/candidateRoutes');
 const jobRoutes = require('./routes/jobRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -16,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

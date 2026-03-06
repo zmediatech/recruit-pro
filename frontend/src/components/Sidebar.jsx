@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
     Users,
@@ -11,10 +11,23 @@ import {
     UploadCloud,
     UserPlus,
     Briefcase,
-    Database
+    Database,
+    LogOut
 } from 'lucide-react';
 
 export default function Sidebar() {
+    const location = useLocation();
+    const isAdminPath = location.pathname.startsWith('/admin');
+    const isPortalPath = location.pathname.startsWith('/portal') || location.pathname.startsWith('/assess-portal');
+
+    const handleLogout = () => {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        window.location.href = '/admin/login';
+    };
+
+    if (location.pathname === '/admin/login') return null;
+
     return (
         <div className="sidebar">
             <div className="sidebar-logo">
@@ -23,47 +36,68 @@ export default function Sidebar() {
             </div>
 
             <nav className="sidebar-nav">
-                <NavLink to="/" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                    <LayoutDashboard size={18} />
-                    <span>Recruitment Overview</span>
-                </NavLink>
-
-                <NavLink to="/intake" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                    <UserPlus size={18} />
-                    <span>Candidate Form</span>
-                </NavLink>
-
-                <NavLink to="/ingest" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                    <Database size={18} />
-                    <span>Add Candidate</span>
-                </NavLink>
-
-                <NavLink to="/jobs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                    <Briefcase size={18} />
-                    <span>Job Manager</span>
-                </NavLink>
-
-                <NavLink to="/interview" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                    <ShieldCheck size={18} />
-                    <span>Interview Guides</span>
-                </NavLink>
-
-                <NavLink to="/assess" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                    <Gamepad2 size={18} />
-                    <span>Assessment Center</span>
-                </NavLink>
-
-                <NavLink to="/cv-upload" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                    <UploadCloud size={18} />
-                    <span>Scan Resume</span>
-                </NavLink>
+                {isAdminPath ? (
+                    <>
+                        <div className="sidebar-section-label">SUPER ADMIN PANEL</div>
+                        <NavLink to="/admin/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <LayoutDashboard size={18} />
+                            <span>Control Center</span>
+                        </NavLink>
+                        <NavLink to="/jobs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <Briefcase size={18} />
+                            <span>Job Repository</span>
+                        </NavLink>
+                        <NavLink to="/" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <Settings size={18} />
+                            <span>System Settings</span>
+                        </NavLink>
+                        <button onClick={handleLogout} className="sidebar-link" style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer' }}>
+                            <LogOut size={18} />
+                            <span>Exit Terminal</span>
+                        </button>
+                    </>
+                ) : isPortalPath ? (
+                    <>
+                        <div className="sidebar-section-label">CANDIDATE PORTAL</div>
+                        <NavLink to="/portal" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <Briefcase size={18} />
+                            <span>Open Roles</span>
+                        </NavLink>
+                        <NavLink to="/assess-portal" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <Gamepad2 size={18} />
+                            <span>Active Assessments</span>
+                        </NavLink>
+                    </>
+                ) : (
+                    <>
+                        <div className="sidebar-section-label">OPERATIONS</div>
+                        <NavLink to="/" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <LayoutDashboard size={18} />
+                            <span>Overview</span>
+                        </NavLink>
+                        <NavLink to="/jobs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <Briefcase size={18} />
+                            <span>Job Manager</span>
+                        </NavLink>
+                        <NavLink to="/assess" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <Gamepad2 size={18} />
+                            <span>Assessment Center</span>
+                        </NavLink>
+                        <NavLink to="/cv-upload" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <UploadCloud size={18} />
+                            <span>AI Resumes</span>
+                        </NavLink>
+                    </>
+                )}
             </nav>
 
             <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
-                <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                    <Settings size={18} />
-                    <span>Settings</span>
-                </NavLink>
+                {!isAdminPath && !isPortalPath && (
+                    <NavLink to="/admin/login" className="sidebar-link">
+                        <ShieldCheck size={18} />
+                        <span>Admin Access</span>
+                    </NavLink>
+                )}
 
                 <div style={{
                     marginTop: '1.5rem',
@@ -79,7 +113,7 @@ export default function Sidebar() {
                         letterSpacing: '0.05em',
                         marginBottom: '0.5rem',
                         fontWeight: 700
-                    }}>System Status</p>
+                    }}>{isAdminPath ? 'ADMIN ENCRYPTED' : 'SYSTEM STATUS'}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <div style={{
                             width: 6,
@@ -88,7 +122,7 @@ export default function Sidebar() {
                             background: 'var(--accent-green)',
                             boxShadow: '0 0 10px var(--accent-green)'
                         }} />
-                        <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Active</span>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Connected</span>
                     </div>
                 </div>
             </div>

@@ -31,6 +31,18 @@ const candidateSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    location: {
+        type: String,
+        trim: true
+    },
+    linkedin: {
+        type: String,
+        trim: true
+    },
+    portfolio: {
+        type: String,
+        trim: true
+    },
     availability: {
         type: String,
         trim: true
@@ -100,6 +112,17 @@ const candidateSchema = new mongoose.Schema({
         riskSignals: [String],
         summary: String,
         analyzedAt: Date
+    },
+    technicalAssessment: {
+        role: String,
+        questions: [{
+            question: String,
+            answer: String,
+            aiScore: Number,
+            aiFeedback: String
+        }],
+        overallScore: { type: Number, default: 0 },
+        completedAt: Date
     },
     telemetryLogs: [{
         timestamp: { type: Date, default: Date.now },
