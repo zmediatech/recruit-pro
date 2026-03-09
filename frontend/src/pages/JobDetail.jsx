@@ -39,6 +39,8 @@ export default function JobDetail() {
         }
     };
 
+    const isAdminPath = location.pathname.startsWith('/admin');
+
     if (loading) {
         return (
             <div className="glass-panel" style={{ textAlign: 'center', padding: '5rem' }}>
@@ -53,7 +55,9 @@ export default function JobDetail() {
             <div className="glass-panel" style={{ textAlign: 'center', padding: '5rem' }}>
                 <Briefcase size={48} style={{ marginBottom: '2rem', opacity: 0.5 }} />
                 <h3>JOB SPECIFICATION NOT FOUND</h3>
-                <button onClick={() => navigate('/jobs')} className="btn btn-primary" style={{ marginTop: '2rem' }}>RETURN TO JOB MANAGER</button>
+                <button onClick={() => navigate(isAdminPath ? '/admin/jobs' : '/portal')} className="btn btn-primary" style={{ marginTop: '2rem' }}>
+                    RETURN TO {isAdminPath ? 'JOB MANAGER' : 'PORTAL'}
+                </button>
             </div>
         );
     }
@@ -61,11 +65,11 @@ export default function JobDetail() {
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ maxWidth: 1000, margin: '0 auto' }}>
             <button
-                onClick={() => navigate('/jobs')}
+                onClick={() => navigate(isAdminPath ? '/admin/jobs' : '/portal')}
                 className="btn btn-outline"
                 style={{ marginBottom: '2rem', border: 'none', paddingLeft: 0, opacity: 0.6 }}
             >
-                <ArrowLeft size={16} /> BACK TO JOB MANAGER
+                <ArrowLeft size={16} /> BACK TO {isAdminPath ? 'JOB MANAGER' : 'PORTAL'}
             </button>
 
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '3rem' }}>
@@ -131,12 +135,18 @@ export default function JobDetail() {
                     </div>
 
                     <div className="glass-panel" style={{ padding: '2rem', background: 'var(--bg-subtle)' }}>
-                        <h4 style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>Candidate Inflow</h4>
+                        <h4 style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>{isAdminPath ? 'Candidate Inflow' : 'Join the Team'}</h4>
                         <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-                            New applicants are being processed by the AI orchestration engine.
+                            {isAdminPath
+                                ? 'New applicants are being processed by the AI orchestration engine.'
+                                : 'Ready to showcase your skills? Start our AI-driven assessment orchestration.'}
                         </p>
-                        <button onClick={() => navigate('/')} className="btn btn-primary" style={{ width: '100%' }}>
-                            VIEW APPLICANTS
+                        <button
+                            onClick={() => navigate(isAdminPath ? '/admin/dashboard' : '/assess-portal')}
+                            className="btn btn-primary"
+                            style={{ width: '100%' }}
+                        >
+                            {isAdminPath ? 'VIEW APPLICANTS' : 'APPLY FOR JOB'}
                         </button>
                     </div>
                 </div>

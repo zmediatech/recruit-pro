@@ -1,5 +1,6 @@
 const Candidate = require('../models/Candidate');
 const { calculateMetrics } = require('../services/metrics');
+const { sendConfirmationEmail } = require('../services/emailService');
 
 // @route   POST /api/candidates/ingest
 // @route   POST /api/candidates/:id/ingest
@@ -112,6 +113,9 @@ const intakeCandidate = async (req, res) => {
         });
 
         await candidate.save();
+
+        // Send Confirmation Email (Async - don't block response)
+        sendConfirmationEmail(candidate).catch(err => console.error("Auto-email failed:", err));
 
         res.status(201).json({
             success: true,

@@ -44,8 +44,85 @@ router.post('/seed', async (req, res) => {
 });
 
 const { exportCandidates } = require('../controllers/candidateController');
+const SmtpConfig = require('../models/SmtpConfig');
+const authMiddleware = require('../middleware/authMiddleware');
+const { sendTestEmail } = require('../services/emailService');
 
 // Export Data
 router.get('/export', exportCandidates);
+
+// --- SMTP CONFIGURATION ROUTES ---
+
+// Get SMTP Settings
+router.get('/smtp', authMiddleware, async (req, res) => {
+    try {
+        const config = await SmtpConfig.findOne();
+        if (!config) return res.json({ success: true, config: null });
+
+        // Mask password
+        const maskedConfig = config.toObject();
+        maskedConfig.password = '********';
+
+        res.json({ success: true, config: maskedConfig });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Save/Update SMTP Settings
+router.post('/smtp', authMiddleware, async (req, res) => {
+    try {
+        const { host, port, username, password, encryption, fromEmail, fromName } = req.body;
+
+        let config = await SmtpConfig.findOne();
+        let encryptedPassword = password;
+
+        // If password is '********', it means it hasn't changed
+        if (password === '********' && config) {
+            encryptedPassword = config.password;
+        } else {
+            encryptedPassword = SmtpConfig.encrypt(password);
+        }
+
+        if (config) {
+            config.host = host;
+            config.port = port;
+            config.username = username;
+            config.password = encryptedPassword;
+            config.encryption = encryption;
+            config.fromEmail = fromEmail;
+            config.fromName = fromName;
+            config.updatedAt = Date.now();
+            await config.save();
+        } else {
+            config = new SmtpConfig({
+                host, port, username, password: encryptedPassword, encryption, fromEmail, fromName
+            });
+            await config.save();
+        }
+
+        res.json({ success: true, message: 'SMTP settings updated successfully' });
+    } catch (err) {
+        console.error("POST SMTP Error:", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Test SMTP Connection
+router.post('/smtp/test', authMiddleware, async (req, res) => {
+    try {
+        const { testEmail } = req.body;
+        if (!testEmail) return res.status(400).json({ success: false, message: 'Test email is required' });
+
+        const result = await sendTestEmail(testEmail);
+        if (result.success) {
+            res.json({ success: true, message: 'Test email sent successfully!' });
+        } else {
+            res.status(500).json({ success: false, error: result.error });
+        }
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 module.exports = router;

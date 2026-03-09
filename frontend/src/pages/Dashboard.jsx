@@ -150,7 +150,7 @@ function CandidateCard({ c, delay }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay }}
         >
-            <Link to={`/candidate/${c._id}`} state={{ candidate: c }} className="glass-panel candidate-card" style={{ textDecoration: 'none', display: 'block' }}>
+            <Link to={`/admin/candidate/${c._id}`} state={{ candidate: c }} className="glass-panel candidate-card" style={{ textDecoration: 'none', display: 'block' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                     <div>
                         <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>{c.name}</h3>

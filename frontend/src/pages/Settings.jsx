@@ -1,12 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon, Shield, Bell, Database, Cpu } from 'lucide-react';
+import { Sun, Moon, Shield, Bell, Database, Cpu, Mail } from 'lucide-react';
+import SmtpSetupForm from '../components/SmtpSetupForm';
 
 export default function Settings() {
     const { theme, toggleTheme } = useTheme();
 
     const sections = [
+        // ... previous sections ...
         {
             title: 'Appearance',
             icon: <Sun size={20} />,
@@ -55,7 +57,7 @@ export default function Settings() {
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{ maxWidth: '800px', margin: '0 auto' }}
+            style={{ maxWidth: '800px', margin: '0 auto', paddingBottom: '5rem' }}
         >
             <header style={{ marginBottom: '3rem' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: 800, letterSpacing: '1px', marginBottom: '0.5rem' }}>
@@ -82,6 +84,22 @@ export default function Settings() {
                         {section.content}
                     </motion.div>
                 ))}
+
+                {/* SMTP Setup Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', marginTop: '1rem' }}>
+                        <div style={{ color: 'var(--accent-green)' }}><Mail size={20} /></div>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Communications</h3>
+                    </div>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+                        Configure secure SMTP relay to enable automated system notifications and candidate correspondence.
+                    </p>
+                    <SmtpSetupForm />
+                </motion.div>
             </div>
         </motion.div>
     );

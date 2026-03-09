@@ -74,7 +74,7 @@ export default function AdminDashboard() {
                     <button className="saas-btn-outline" onClick={exportToExcel}>
                         <FileDown size={18} /> EXCEL EXPORT
                     </button>
-                    <button className="saas-btn-primary" onClick={() => navigate('/jobs')}>
+                    <button className="saas-btn-primary" onClick={() => navigate('/admin/jobs')}>
                         <Plus size={18} /> NEW JOB ROLE
                     </button>
                 </div>
@@ -136,7 +136,7 @@ export default function AdminDashboard() {
                                     style={{ borderBottom: '1px solid var(--saas-border-card)', cursor: 'pointer', transition: 'background 0.2s' }}
                                     onMouseOver={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
                                     onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-                                    onClick={() => navigate(`/candidate/${c._id}`)}
+                                    onClick={() => navigate(`/admin/candidate/${c._id}`)}
                                 >
                                     <td style={{ padding: '1rem 2rem', fontSize: '0.85rem', fontWeight: 700, color: '#3b82f6' }}>{c.candidateId || 'N/A'}</td>
                                     <td style={{ padding: '1rem 2rem', fontSize: '0.9rem', fontWeight: 600 }}>{c.name}</td>

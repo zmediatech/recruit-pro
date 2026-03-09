@@ -66,7 +66,7 @@ export default function CandidateDetail() {
     return (
         <motion.div initial={{ opacity: 0, scale: 0.99 }} animate={{ opacity: 1, scale: 1 }} className="candidate-detail-container">
             <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/admin/dashboard')}
                 className="btn btn-outline"
                 style={{ marginBottom: '2rem', border: 'none', paddingLeft: 0, opacity: 0.6 }}
             >

@@ -43,11 +43,11 @@ export default function Sidebar() {
                             <LayoutDashboard size={18} />
                             <span>Control Center</span>
                         </NavLink>
-                        <NavLink to="/jobs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                        <NavLink to="/admin/jobs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                             <Briefcase size={18} />
                             <span>Job Repository</span>
                         </NavLink>
-                        <NavLink to="/" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                        <NavLink to="/admin/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                             <Settings size={18} />
                             <span>System Settings</span>
                         </NavLink>

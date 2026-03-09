@@ -136,7 +136,7 @@ export default function AssessmentLauncher() {
                 {stage === 'report' && (
                     <AssessmentReport
                         candidateName={candidateName}
-                        onFinish={() => navigate('/')}
+                        onFinish={() => navigate('/admin/dashboard')}
                     />
                 )}
 

@@ -75,7 +75,7 @@ export default function JobManager() {
                         animate={{ opacity: 1 }}
                         whileHover={{ scale: 1.01, borderColor: 'var(--accent-blue)' }}
                         className="glass-panel"
-                        onClick={() => navigate(`/jobs/${job._id}`, { state: { job } })}
+                        onClick={() => navigate(`/admin/jobs/${job._id}`, { state: { job } })}
                         style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', transition: 'border-color 0.2s ease' }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>

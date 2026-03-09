@@ -35,33 +35,65 @@ function App() {
                     <main className="main-content">
                         <Routes>
                             {/* Candidate Panel (Public) */}
+                            <Route path="/" element={<Navigate to="/portal" replace />} />
                             <Route path="/portal" element={<CandidatePortal />} />
                             <Route path="/assess-portal" element={<CandidateAssessmentPortal />} />
-
-                            {/* Legacy Routes / Catch-alls */}
-                            <Route path="/intake" element={<IntakeGateway />} />
-                            <Route path="/jobs" element={<JobManager />} />
                             <Route path="/jobs/:id" element={<JobDetail />} />
-                            <Route path="/cv-upload" element={<CVUpload />} />
 
                             {/* Super Admin Panel (Private) */}
                             <Route path="/admin/login" element={<AdminLogin />} />
+                            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+
                             <Route path="/admin/dashboard" element={
                                 <ProtectedRoute>
                                     <AdminDashboard />
                                 </ProtectedRoute>
                             } />
 
-                            {/* Internal Tooling Routes */}
-                            <Route path="/" element={<Navigate to="/portal" replace />} />
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/candidate/:id" element={<CandidateDetail />} />
-                            <Route path="/ingest" element={<IngestionScreen />} />
-                            <Route path="/assessment" element={<TechnicalAssessment />} />
-                            <Route path="/gauntlet/:id" element={<GauntletPortal />} />
-                            <Route path="/interview" element={<InterviewWizard />} />
-                            <Route path="/settings" element={<Settings />} />
-                            <Route path="/assess" element={<AssessmentLauncher />} />
+                            <Route path="/admin/jobs" element={
+                                <ProtectedRoute>
+                                    <JobManager />
+                                </ProtectedRoute>
+                            } />
+
+                            <Route path="/admin/jobs/:id" element={
+                                <ProtectedRoute>
+                                    <JobDetail />
+                                </ProtectedRoute>
+                            } />
+
+                            <Route path="/admin/candidate/:id" element={
+                                <ProtectedRoute>
+                                    <CandidateDetail />
+                                </ProtectedRoute>
+                            } />
+
+                            <Route path="/admin/cv-upload" element={
+                                <ProtectedRoute>
+                                    <CVUpload />
+                                </ProtectedRoute>
+                            } />
+
+                            <Route path="/admin/settings" element={
+                                <ProtectedRoute>
+                                    <Settings />
+                                </ProtectedRoute>
+                            } />
+
+                            <Route path="/admin/assess" element={
+                                <ProtectedRoute>
+                                    <AssessmentLauncher />
+                                </ProtectedRoute>
+                            } />
+
+                            {/* Internal Operation Tools (Legacy Path Support - Protected) */}
+                            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                            <Route path="/candidate/:id" element={<ProtectedRoute><CandidateDetail /></ProtectedRoute>} />
+                            <Route path="/ingest" element={<ProtectedRoute><IngestionScreen /></ProtectedRoute>} />
+                            <Route path="/assessment" element={<ProtectedRoute><TechnicalAssessment /></ProtectedRoute>} />
+                            <Route path="/gauntlet/:id" element={<ProtectedRoute><GauntletPortal /></ProtectedRoute>} />
+                            <Route path="/interview" element={<ProtectedRoute><InterviewWizard /></ProtectedRoute>} />
+                            <Route path="/intake" element={<ProtectedRoute><IntakeGateway /></ProtectedRoute>} />
                         </Routes>
                     </main>
                 </div>

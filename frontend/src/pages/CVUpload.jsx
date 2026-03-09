@@ -260,7 +260,7 @@ export default function CVUpload() {
                                 <button className="saas-btn-outline" onClick={() => { setReport(null); setFile(null); }}>
                                     <RefreshCcw size={18} /> NEW UPLOAD
                                 </button>
-                                <button className="saas-btn-primary" onClick={() => navigate('/')}>
+                                <button className="saas-btn-primary" onClick={() => navigate('/admin/dashboard')}>
                                     RETURN TO DASHBOARD <ArrowRight size={18} />
                                 </button>
                             </div>
