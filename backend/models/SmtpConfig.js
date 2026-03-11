@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 
 // ENCRYPTION KEY & IV (In a real app, these should be in .env)
-const ENCRYPTION_KEY = process.env.SMTP_SECRET || 'recruitpro-smtp-secure-key-32ch'; // Must be 32 chars
+const ENCRYPTION_KEY = process.env.SMTP_SECRET || 'recruitpro-secure-smtp-key-32chr'; // Must be 32 chars
 const IV_LENGTH = 16;
 
 const smtpConfigSchema = new mongoose.Schema({

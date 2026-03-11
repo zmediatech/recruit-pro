@@ -62,6 +62,12 @@ const ingestCandidate = async (req, res) => {
         }
 
         if (!candidate) return res.status(404).json({ error: 'Candidate not found' });
+
+        // Send confirmation email only on final submission (when assessment is complete)
+        if (id && candidate.stage === 'Evaluated') {
+            sendConfirmationEmail(candidate).catch(err => console.error("Confirmation email failed:", err));
+        }
+
         res.status(200).json(candidate);
 
     } catch (err) {
@@ -114,8 +120,8 @@ const intakeCandidate = async (req, res) => {
 
         await candidate.save();
 
-        // Send Confirmation Email (Async - don't block response)
-        sendConfirmationEmail(candidate).catch(err => console.error("Auto-email failed:", err));
+        // Email is sent after final submission (see ingestCandidate) not here
+        // This keeps the intake fast and non-blocking
 
         res.status(201).json({
             success: true,

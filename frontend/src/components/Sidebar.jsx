@@ -43,6 +43,10 @@ export default function Sidebar() {
                             <LayoutDashboard size={18} />
                             <span>Control Center</span>
                         </NavLink>
+                        <NavLink to="/admin/candidates" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <Users size={18} />
+                            <span>Candidates</span>
+                        </NavLink>
                         <NavLink to="/admin/jobs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                             <Briefcase size={18} />
                             <span>Job Repository</span>

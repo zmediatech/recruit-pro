@@ -91,14 +91,25 @@ const candidateSchema = new mongoose.Schema({
         type: String,
         default: 'None'
     },
+    status: {
+        type: String,
+        default: 'Pending'
+    },
     stage: {
         type: String,
-        enum: ['Intake', 'Pending', 'Screening', 'Ethics Review', 'Assessment', 'Evaluated'],
+        enum: ['Intake', 'Pending', 'Screening', 'Ethics Review', 'Assessment', 'Evaluated', 'Shortlisted', 'Interview', 'Interview Scheduled', 'Rejected'],
         default: 'Intake'
     },
     isRejected: {
         type: Boolean,
         default: false
+    },
+    interviewDetails: {
+        date: String,
+        time: String,
+        link: String,
+        type: { type: String, enum: ['Online', 'Physical'] },
+        notes: String
     },
     createdAt: {
         type: Date,

@@ -4,7 +4,7 @@
   "description": "Backend for The Stoic Polymath Filter",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "dev": "node server.js"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.3.4",
     "nodemailer": "^8.0.1",
+    "nodemon": "^3.1.14",
     "pdf-parse": "^2.4.5",
     "xlsx": "^0.18.5"
   }
