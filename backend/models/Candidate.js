@@ -127,12 +127,19 @@ const candidateSchema = new mongoose.Schema({
     technicalAssessment: {
         role: String,
         questions: [{
-            question: String,
-            answer: String,
-            aiScore: Number,
-            aiFeedback: String
+            questionText: String,
+            type: { type: String, enum: ['MCQ', 'ShortAnswer', 'Scenario'] },
+            options: [String], // For MCQs
+            correctAnswer: String,
+            candidateAnswer: String,
+            score: { type: Number, default: 0 },
+            feedback: String
         }],
         overallScore: { type: Number, default: 0 },
+        evaluationSummary: String,
+        strengths: [String],
+        weaknesses: [String],
+        recommendedLevel: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced', 'N/A'], default: 'N/A' },
         completedAt: Date
     },
     telemetryLogs: [{

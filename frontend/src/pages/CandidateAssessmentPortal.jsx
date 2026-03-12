@@ -79,6 +79,13 @@ export default function CandidateAssessmentPortal() {
 
     // --- STEP 1: INITIAL SUBMISSION ---
     const submitInitialInfo = async () => {
+        // Basic frontend validation
+        if (!formData.name || !formData.email || !formData.phone) {
+            setError('Please fill in Name, Email, and Phone to continue.');
+            return;
+        }
+        
+        setError('');
         setLoading(true);
         try {
             const res = await axios.post('http://localhost:5001/api/candidates/intake', {
@@ -93,7 +100,8 @@ export default function CandidateAssessmentPortal() {
             }
         } catch (err) {
             console.error("Submission failed", err);
-            alert("Connection error. Please check backend.");
+            const msg = err.response?.data?.error || 'Connection error. Please check backend.';
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -102,6 +110,7 @@ export default function CandidateAssessmentPortal() {
     // --- STEP 4: GENERATE TECH TEST ---
     const startTechnicalAssessment = async () => {
         setIsGeneratingTech(true);
+        setError('');
         setStep(4);
         try {
             const res = await axios.post(`http://localhost:5001/api/candidates/${dbId}/analyze`);
@@ -111,6 +120,8 @@ export default function CandidateAssessmentPortal() {
             }
         } catch (err) {
             console.error("AI Generation failed", err);
+            const msg = err.response?.data?.error || "AI Synthesis failed. Please ensure the backend GEMINI_API_KEY is configured correctly.";
+            setError(msg);
         } finally {
             setIsGeneratingTech(false);
         }
@@ -153,6 +164,26 @@ export default function CandidateAssessmentPortal() {
         } catch (err) {
             console.error("Finalization failed:", err);
             const msg = err.response?.data?.error || err.message || 'Failed to submit. Please check your connection.';
+            setError(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // --- STEP 4: SUBMIT TECH TEST ---
+    const submitTechnicalAnswers = async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const res = await axios.post(`http://localhost:5001/api/candidates/${dbId}/submit-tech`, {
+                answers: techAnswers
+            });
+            if (res.data.success) {
+                setStep(5);
+            }
+        } catch (err) {
+            console.error("Technical submission failed", err);
+            const msg = err.response?.data?.error || "Failed to save technical responses. Please try again.";
             setError(msg);
         } finally {
             setLoading(false);
@@ -208,6 +239,9 @@ export default function CandidateAssessmentPortal() {
                                 </label>
                             </div>
                         </div>
+
+                        {error && <p style={{ color: '#f87171', marginTop: '1.5rem', fontSize: '0.9rem', textAlign: 'center' }}>⚠️ {error}</p>}
+
                         <button className="saas-btn-primary" style={{ width: '100%', marginTop: '3rem' }} onClick={submitInitialInfo}>
                             CONTINUE TO ROLE {loading ? <Loader2 size={18} className="spinning" /> : <ArrowRight size={18} />}
                         </button>
@@ -269,24 +303,71 @@ export default function CandidateAssessmentPortal() {
                         ) : (
                             <div>
                                 {techQuestions.map((q, idx) => (
-                                    <div key={idx} style={{ marginBottom: '2.5rem' }}>
-                                        <p style={{ fontWeight: 700, marginBottom: '1rem', color: 'var(--saas-text-heading)', fontSize: '1.1rem' }}>Q{idx + 1}: {q.QuestionText}</p>
-                                        <textarea
-                                            className="saas-input"
-                                            style={{ minHeight: '120px', resize: 'none' }}
-                                            placeholder="Provide your technical explanation..."
-                                            value={techAnswers[idx]}
-                                            onChange={e => {
-                                                const newA = [...techAnswers];
-                                                newA[idx] = e.target.value;
-                                                setTechAnswers(newA);
-                                            }}
-                                        />
+                                    <div key={idx} style={{ marginBottom: '3rem', padding: '2rem', background: 'var(--bg-subtle)', borderRadius: '15px', border: '1px solid var(--saas-border-card)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                                            <p style={{ fontWeight: 800, color: 'var(--saas-text-heading)', fontSize: '1.1rem', flex: 1 }}>Q{idx + 1}: {q.questionText}</p>
+                                            <span style={{ fontSize: '0.65rem', padding: '4px 8px', background: 'var(--saas-border-card)', borderRadius: '6px', fontWeight: 700, marginLeft: '1rem' }}>{q.type}</span>
+                                        </div>
+
+                                        {q.type === 'MCQ' ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                                {q.options.map((opt, oIdx) => (
+                                                    <label key={oIdx} style={{
+                                                        display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: techAnswers[idx] === opt ? 'rgba(59, 130, 246, 0.1)' : 'var(--bg-card)',
+                                                        border: `1px solid ${techAnswers[idx] === opt ? '#3b82f6' : 'var(--saas-border-card)'}`,
+                                                        borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s ease'
+                                                    }}>
+                                                        <input
+                                                            type="radio"
+                                                            name={`q-${idx}`}
+                                                            checked={techAnswers[idx] === opt}
+                                                            onChange={() => {
+                                                                const newA = [...techAnswers];
+                                                                newA[idx] = opt;
+                                                                setTechAnswers(newA);
+                                                            }}
+                                                            style={{ width: '18px', height: '18px' }}
+                                                        />
+                                                        <span style={{ fontSize: '0.95rem', fontWeight: 500 }}>{opt}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <textarea
+                                                className="saas-input"
+                                                style={{ minHeight: '140px', resize: 'none', background: 'var(--bg-card)' }}
+                                                placeholder={q.type === 'Scenario' ? "Describe your step-by-step approach..." : "Provide your technical explanation..."}
+                                                value={techAnswers[idx]}
+                                                onChange={e => {
+                                                    const newA = [...techAnswers];
+                                                    newA[idx] = e.target.value;
+                                                    setTechAnswers(newA);
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                 ))}
-                                <button className="saas-btn-primary" style={{ width: '100%', marginTop: '2rem' }} onClick={() => setStep(5)}>
-                                    SUBMIT TECHNICAL RESPONSES <ArrowRight size={18} />
-                                </button>
+
+                                {error && <p style={{ color: '#f87171', marginBottom: '1.5rem', textAlign: 'center' }}>⚠️ {error}</p>}
+                                
+                                {techQuestions.length > 0 ? (
+                                    <button
+                                        className="saas-btn-primary"
+                                        style={{ width: '100%', marginTop: '2rem' }}
+                                        onClick={submitTechnicalAnswers}
+                                        disabled={loading || techAnswers.some(a => !a)}
+                                    >
+                                        {loading ? <Loader2 size={18} className="spinning" /> : <><CheckCircle size={18} /> COMPLETE TECHNICAL ASSESSMENT</>}
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="saas-btn-outline"
+                                        style={{ width: '100%', marginTop: '2rem' }}
+                                        onClick={startTechnicalAssessment}
+                                    >
+                                        <BrainCircuit size={18} /> RETRY AI GENERATION
+                                    </button>
+                                )}
                             </div>
                         )}
                     </motion.div>

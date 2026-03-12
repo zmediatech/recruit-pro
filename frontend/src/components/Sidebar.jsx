@@ -57,7 +57,7 @@ export default function Sidebar() {
                         </NavLink>
                         <button onClick={handleLogout} className="sidebar-link" style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer' }}>
                             <LogOut size={18} />
-                            <span>Exit Terminal</span>
+                            <span>Log Out</span>
                         </button>
                     </>
                 ) : isPortalPath ? (

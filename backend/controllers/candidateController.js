@@ -120,9 +120,6 @@ const intakeCandidate = async (req, res) => {
 
         await candidate.save();
 
-        // Email is sent after final submission (see ingestCandidate) not here
-        // This keeps the intake fast and non-blocking
-
         res.status(201).json({
             success: true,
             id: candidate._id,
@@ -131,6 +128,10 @@ const intakeCandidate = async (req, res) => {
         });
     } catch (err) {
         console.error("Intake Error:", err);
+        if (err.name === 'ValidationError') {
+            const messages = Object.values(err.errors).map(val => val.message);
+            return res.status(400).json({ error: `Validation Error: ${messages.join(', ')}` });
+        }
         res.status(500).json({ error: 'Failed to process candidate intake.' });
     }
 };
@@ -185,6 +186,26 @@ const performCVAnalysis = async (req, res) => {
         // Generate dynamic questions
         const adaptiveQuestions = await generateAdaptiveTest(mockCVText, candidate.positionApplied);
 
+        // Fallback is now handled in the service, so we expect questions here
+        // If it still returns empty (unlikely with mock), then we show error
+        if (!adaptiveQuestions || adaptiveQuestions.length === 0) {
+            return res.status(500).json({ error: 'System error: Unable to generate assessment logic.' });
+        }
+
+        candidate.technicalAssessment = {
+            role: candidate.positionApplied,
+            questions: adaptiveQuestions.map(q => ({
+                questionText: q.questionText,
+                type: q.type,
+                options: q.options || [],
+                correctAnswer: q.correctAnswer,
+                candidateAnswer: '',
+                score: 0,
+                feedback: ''
+            })),
+            completedAt: null
+        };
+
         candidate.telemetryLogs.push({
             action: 'GEMINI_AI_ANALYSIS_COMPLETED',
             payload: { analysis, questionsCount: adaptiveQuestions.length }
@@ -192,10 +213,75 @@ const performCVAnalysis = async (req, res) => {
 
         await candidate.save();
 
-        res.json({ success: true, aiAnalysis: candidate.aiAnalysis, questions: adaptiveQuestions });
+        res.json({ success: true, aiAnalysis: candidate.aiAnalysis, questions: candidate.technicalAssessment.questions });
     } catch (err) {
         console.error("AI Analysis Route Error:", err);
-        res.status(500).json({ error: 'Failed to orchestrate AI analysis.' });
+        const msg = err.message || 'Failed to orchestrate AI analysis.';
+        res.status(500).json({ error: msg });
+    }
+};
+
+// @route   POST /api/candidates/:id/submit-tech
+// @desc    Store candidate technical assessment responses
+const submitTechnicalAssessment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { answers } = req.body;
+
+        const candidate = await Candidate.findById(id);
+        if (!candidate) return res.status(404).json({ error: 'Candidate not found' });
+
+        if (!candidate.technicalAssessment || !candidate.technicalAssessment.questions.length) {
+            return res.status(400).json({ error: 'Technical assessment not initialized for this candidate' });
+        }
+
+        // Map answers back to questions
+        candidate.technicalAssessment.questions.forEach((q, idx) => {
+            if (answers && answers[idx] !== undefined) {
+                q.candidateAnswer = answers[idx];
+            }
+        });
+
+        // Trigger Evaluation via Gemini (or fallback)
+        const evaluation = await evaluateTechnicalAssessment(
+            candidate.technicalAssessment.questions,
+            answers || [],
+            candidate.positionApplied
+        );
+
+        // Map evaluation results to model
+        candidate.technicalAssessment.overallScore = evaluation.overallScore;
+        candidate.technicalAssessment.evaluationSummary = evaluation.evaluationSummary;
+        candidate.technicalAssessment.strengths = evaluation.strengths;
+        candidate.technicalAssessment.weaknesses = evaluation.weaknesses;
+        candidate.technicalAssessment.recommendedLevel = evaluation.recommendedLevel;
+        
+        candidate.technicalAssessment.completedAt = new Date();
+        candidate.markModified('technicalAssessment');
+
+        candidate.telemetryLogs.push({
+            action: 'TECHNICAL_ASSESSMENT_SUBMITTED_AND_EVALUATED',
+            payload: { 
+                timestamp: new Date(), 
+                score: evaluation.overallScore,
+                level: evaluation.recommendedLevel
+            }
+        });
+
+        await candidate.save();
+
+        res.json({ 
+            success: true, 
+            message: 'Technical assessment evaluated successfully',
+            score: evaluation.overallScore,
+            level: evaluation.recommendedLevel
+        });
+    } catch (err) {
+        console.error("Tech Submit Error:", err);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ error: `Validation Failure: ${err.message}` });
+        }
+        res.status(500).json({ error: err.message || 'Failed to process technical assessment.' });
     }
 };
 
@@ -243,5 +329,6 @@ module.exports = {
     getCandidateById,
     intakeCandidate,
     performCVAnalysis,
+    submitTechnicalAssessment,
     exportCandidates
 };

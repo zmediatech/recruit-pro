@@ -7,8 +7,9 @@ import {
     User, Mail, Phone, MapPin, Video, Download, Calendar,
     Clock, X, Loader2, CheckCircle, Send, Star, Link as LinkIcon
 } from 'lucide-react';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import axios from 'axios';
+import { Award, Check, Target, Brain, Scale, ShieldAlert } from 'lucide-react';
 
 // ─── Interview Scheduling Modal ──────────────────────────────────────────────
 function ScheduleModal({ candidate, onClose, onSuccess }) {
@@ -263,6 +264,7 @@ export default function CandidateDetail() {
         { subject: 'Intelligence', A: coordinates?.X || 0, fullMark: 100 },
         { subject: 'Integrity', A: coordinates?.Y || 0, fullMark: 100 },
         { subject: 'Resilience', A: coordinates?.Z || 0, fullMark: 100 },
+        { subject: 'Technical', A: currentCandidate.technicalAssessment?.overallScore || 0, fullMark: 100 },
     ];
 
     const rhoVal = rho || 1;
@@ -360,6 +362,35 @@ export default function CandidateDetail() {
                     </div>
                 </header>
 
+                {/* --- NEW: CANDIDATE ASSESSMENT REPORT --- */}
+                <div className="glass-panel" style={{ marginBottom: '2rem', background: 'linear-gradient(135deg, rgba(59,130,246,0.05), rgba(16,185,129,0.05))', borderColor: 'rgba(59,130,246,0.2)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <div>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Award size={22} color="var(--accent-green)" /> Candidate Assessment Report
+                            </h2>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Aggregated performance across all evaluation dimensions</p>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>OVERALL RATING</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--accent-green)' }}>
+                                {[1, 2, 3, 4, 5].map(star => {
+                                    const avg = ((coordinates?.X || 0) + (coordinates?.Y || 0) + (coordinates?.Z || 0) + (currentCandidate.technicalAssessment?.overallScore || 0)) / 4;
+                                    const rating = Math.round(avg / 20);
+                                    return <Star key={star} size={16} fill={star <= rating ? 'currentColor' : 'none'} />;
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+                        <IntegratedMetric icon={Brain} label="Intelligence" value={coordinates?.X || 0} color="#3b82f6" />
+                        <IntegratedMetric icon={Scale} label="Ethics" value={coordinates?.Y || 0} color="#8b5cf6" />
+                        <IntegratedMetric icon={Zap} label="Resilience" value={coordinates?.Z || 0} color="#10b981" />
+                        <IntegratedMetric icon={Cpu} label="Technical" value={currentCandidate.technicalAssessment?.overallScore || 0} color="#f59e0b" />
+                    </div>
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.85fr', gap: '2rem' }}>
                     {/* Left Column */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -414,22 +445,106 @@ export default function CandidateDetail() {
                             </div>
                         </div>
 
-                        {/* Technical Responses */}
+                        {/* Technical Results Card */}
                         <div className="glass-panel">
-                            <h3 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <Terminal size={18} color="var(--accent-green)" /> Technical Assessment
-                            </h3>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Terminal size={18} color="var(--accent-green)" /> Technical Assessment Results
+                                </h3>
+                                {currentCandidate.technicalAssessment?.recommendedLevel && (
+                                    <span style={{ 
+                                        fontSize: '0.7rem', fontWeight: 800, padding: '4px 12px', borderRadius: '20px', 
+                                        background: 'rgba(59,130,246,0.1)', color: 'var(--accent-blue)', border: '1px solid rgba(59,130,246,0.3)'
+                                    }}>
+                                        {currentCandidate.technicalAssessment.recommendedLevel.toUpperCase()} LEVEL
+                                    </span>
+                                )}
+                            </div>
+
                             {currentCandidate.technicalAssessment?.questions?.length > 0 ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                    
+                                    {/* AI Evaluation Summary */}
+                                    {currentCandidate.technicalAssessment.evaluationSummary && (
+                                        <div style={{ padding: '1.5rem', background: 'rgba(16,185,129,0.05)', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.2)', marginBottom: '1rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                                                <div style={{ padding: '8px', background: 'var(--accent-green)', borderRadius: '8px', color: 'white' }}>
+                                                    <Cpu size={16} />
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-secondary)' }}>AI EVALUATION SUMMARY</div>
+                                                    <div style={{ fontSize: '1.1rem', fontWeight: 900 }}>Technical Score: {currentCandidate.technicalAssessment.overallScore}%</div>
+                                                </div>
+                                            </div>
+                                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6, fontStyle: 'italic', marginBottom: '1.5rem' }}>
+                                                "{currentCandidate.technicalAssessment.evaluationSummary}"
+                                            </p>
+                                            
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                                <div>
+                                                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#10b981', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                        <Check size={12} /> STRENGTHS
+                                                    </div>
+                                                    <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+                                                        {currentCandidate.technicalAssessment.strengths?.map((s, i) => (
+                                                            <li key={i} style={{ fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#10b981' }} /> {s}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#f87171', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                        <ShieldAlert size={12} /> WEAKNESSES
+                                                    </div>
+                                                    <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+                                                        {currentCandidate.technicalAssessment.weaknesses?.map((w, i) => (
+                                                            <li key={i} style={{ fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#f87171' }} /> {w}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-secondary)', letterSpacing: '1px', marginTop: '1rem' }}>DETAILED Q&A LOG</div>
                                     {currentCandidate.technicalAssessment.questions.map((q, i) => (
-                                        <div key={i} style={{ padding: '1rem', background: 'var(--bg-subtle)', borderRadius: '8px', borderLeft: '4px solid var(--accent-blue)' }}>
-                                            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.5rem' }}>Q{i + 1}: {q.question}</p>
-                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>"{q.answer}"</p>
+                                        <div key={i} style={{ padding: '1.25rem', background: 'var(--bg-subtle)', borderRadius: '12px', borderLeft: `4px solid ${q.score >= 70 ? '#10b981' : q.score >= 40 ? '#f59e0b' : '#f87171'}` }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                                <p style={{ fontSize: '0.85rem', fontWeight: 800, flex: 1, paddingRight: '1rem' }}>Q{i + 1}: {q.questionText || q.question}</p>
+                                                <span style={{ fontSize: '0.65rem', padding: '2px 8px', background: 'var(--glass-border)', borderRadius: '6px', fontWeight: 800 }}>{q.type}</span>
+                                            </div>
+                                            
+                                            <div style={{ padding: '1rem', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--glass-border)', marginBottom: '0.75rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                                                    <p style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 800 }}>Candidate Response</p>
+                                                    {q.type === 'MCQ' && (
+                                                        <span style={{ fontSize: '0.6rem', fontWeight: 800, color: q.candidateAnswer === q.correctAnswer ? '#10b981' : '#f87171' }}>
+                                                            {q.candidateAnswer === q.correctAnswer ? 'CORRECT' : 'INCORRECT'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                                                    {q.candidateAnswer || 'No response provided.'}
+                                                </p>
+                                            </div>
+
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <Target size={12} color="var(--text-secondary)" />
+                                                <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                    <strong>Reference Answer:</strong> {q.correctAnswer}
+                                                </p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>No technical assessment responses recorded.</p>
+                                <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.5 }}>
+                                    <AlertTriangle size={32} style={{ margin: '0 auto 1rem' }} />
+                                    <p style={{ fontSize: '0.85rem' }}>No technical assessment data available.</p>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -535,6 +650,32 @@ export default function CandidateDetail() {
 }
 
 // ─── Helper Components ────────────────────────────────────────────────────────
+// ─── Assessment Report Metric ──────────────────────────────────────────
+function IntegratedMetric({ icon: Icon, label, value, color }) {
+    return (
+        <div style={{ 
+            padding: '1.25rem', background: 'var(--bg-primary)', borderRadius: '15px', 
+            border: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', gap: '0.5rem' 
+        }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ padding: '6px', borderRadius: '8px', background: `${color}15`, color: color }}>
+                    <Icon size={16} />
+                </div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-primary)' }}>{value}%</div>
+            </div>
+            <div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</div>
+                <div style={{ width: '100%', height: '4px', background: 'var(--bg-subtle)', borderRadius: '2px', marginTop: '4px', overflow: 'hidden' }}>
+                    <motion.div 
+                        initial={{ width: 0 }} animate={{ width: `${value}%` }} transition={{ duration: 1 }}
+                        style={{ height: '100%', background: color }} 
+                    />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function MetricBox({ label, value, color }) {
     return (
         <div style={{ textAlign: 'center', padding: '0.75rem', background: 'var(--bg-subtle)', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
