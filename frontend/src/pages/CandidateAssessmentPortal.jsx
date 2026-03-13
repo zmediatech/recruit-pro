@@ -153,7 +153,7 @@ export default function CandidateAssessmentPortal() {
                 ...scores,
                 name: formData.name,
                 positionApplied: formData.positionApplied,
-                stage: 'Evaluated'
+                stage: 'Assessment Completed'
             });
 
             if (res.status === 200 || res.status === 201) {

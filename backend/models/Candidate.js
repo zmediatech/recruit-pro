@@ -97,8 +97,8 @@ const candidateSchema = new mongoose.Schema({
     },
     stage: {
         type: String,
-        enum: ['Intake', 'Pending', 'Screening', 'Ethics Review', 'Assessment', 'Evaluated', 'Shortlisted', 'Interview', 'Interview Scheduled', 'Rejected'],
-        default: 'Intake'
+        enum: ['Applied', 'Assessment Completed', 'Shortlisted', 'Interview Scheduled', 'Interview Completed', 'Offer Sent', 'Hired', 'Rejected'],
+        default: 'Applied'
     },
     isRejected: {
         type: Boolean,

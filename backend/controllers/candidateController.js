@@ -44,7 +44,7 @@ const ingestCandidate = async (req, res) => {
             stressedMetrics: { X: fluidIntStressed, Y: noWinScore },
             rho,
             evaluatorNotes: evaluatorNotes || 'Assessment completed.',
-            stage: stage || 'Evaluated',
+            stage: stage || 'Assessment Completed',
             flags: []
         };
 
@@ -64,7 +64,7 @@ const ingestCandidate = async (req, res) => {
         if (!candidate) return res.status(404).json({ error: 'Candidate not found' });
 
         // Send confirmation email only on final submission (when assessment is complete)
-        if (id && candidate.stage === 'Evaluated') {
+        if (id && candidate.stage === 'Assessment Completed') {
             sendConfirmationEmail(candidate).catch(err => console.error("Confirmation email failed:", err));
         }
 
@@ -111,7 +111,7 @@ const intakeCandidate = async (req, res) => {
             availability,
             cvUrl: cvUrl || '',
             videoUrl: videoUrl || '',
-            stage: 'Intake',
+            stage: 'Applied',
             telemetryLogs: [{
                 action: 'INITIAL_PORTAL_SUBMISSION',
                 payload: { timestamp: new Date(), source: 'CandidatePortal' }
@@ -323,6 +323,28 @@ const exportCandidates = async (req, res) => {
     }
 };
 
+const updateCandidateStage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { stage } = req.body;
+
+        const candidate = await Candidate.findById(id);
+        if (!candidate) return res.status(404).json({ error: 'Candidate not found' });
+
+        candidate.stage = stage;
+        candidate.telemetryLogs.push({
+            action: 'STAGE_UPDATED_VIA_PIPELINE',
+            payload: { stage, timestamp: new Date() }
+        });
+
+        await candidate.save();
+        res.json({ success: true, message: `Stage updated to ${stage}`, stage: candidate.stage });
+    } catch (err) {
+        console.error("Stage Update Error:", err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
 module.exports = {
     ingestCandidate,
     getAllCandidates,
@@ -330,5 +352,6 @@ module.exports = {
     intakeCandidate,
     performCVAnalysis,
     submitTechnicalAssessment,
+    updateCandidateStage,
     exportCandidates
 };

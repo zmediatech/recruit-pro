@@ -55,7 +55,19 @@ const { sendTestEmail, sendInterviewEmail } = require('../services/emailService'
 // Export Data
 router.get('/export', exportCandidates);
 
-// --- SYSTEM SETTINGS ROUTES ---
+// Get Public System Info (Theme, Name, etc)
+router.get('/system-info', async (req, res) => {
+    try {
+        const settings = await SystemSettings.findOne();
+        res.json({ 
+            success: true, 
+            theme: settings?.theme || 'dark',
+            systemName: settings?.systemName || 'RecruitPro'
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 // Get System Settings
 router.get('/system-settings', authMiddleware, async (req, res) => {

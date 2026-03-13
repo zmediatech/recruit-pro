@@ -29,6 +29,11 @@ const systemSettingsSchema = new mongoose.Schema({
         type: String,
         default: 'English'
     },
+    theme: {
+        type: String,
+        enum: ['light', 'dark'],
+        default: 'dark'
+    },
     updatedAt: {
         type: Date,
         default: Date.now

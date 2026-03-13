@@ -55,13 +55,13 @@ export default function Dashboard() {
                         rho: 0.94,
                         flags: [],
                         isRejected: false,
-                        stage: 'Evaluated'
+                        stage: 'Assessment Completed'
                     },
                     {
                         _id: '1122-Delta',
                         name: 'John Doe',
                         positionApplied: 'Software Architect',
-                        stage: 'Intake',
+                        stage: 'Applied',
                         isRejected: false
                     }
                 ]);
@@ -82,8 +82,8 @@ export default function Dashboard() {
     );
 
     const activeCandidates = candidates.filter(c => !c.isPlaceholder);
-    const intakeCandidates = activeCandidates.filter(c => c.stage === 'Intake');
-    const evaluatedCandidates = activeCandidates.filter(c => c.stage === 'Evaluated');
+    const intakeCandidates = activeCandidates.filter(c => c.stage === 'Applied');
+    const evaluatedCandidates = activeCandidates.filter(c => c.stage === 'Assessment Completed');
 
     const qualifiedCount = evaluatedCandidates.filter(c => c.rho >= 0.8 && !c.isRejected).length;
 
@@ -158,12 +158,12 @@ function CandidateCard({ c, delay }) {
                             ID: {c.candidateId || (c._id?.length > 8 ? c._id.slice(-8).toUpperCase() : c._id)}
                         </p>
                     </div>
-                    <span className={`status-badge ${c.stage === 'Intake' ? 'status-pending' : c.isRejected ? 'status-rejected' : 'status-valid'}`}>
-                        {c.stage === 'Intake' ? 'Pending' : c.isRejected ? 'Rejected' : 'Qualified'}
+                    <span className={`status-badge ${c.stage === 'Applied' ? 'status-pending' : c.isRejected ? 'status-rejected' : 'status-valid'}`}>
+                        {c.stage === 'Applied' ? 'Pending' : c.isRejected ? 'Rejected' : 'Qualified'}
                     </span>
                 </div>
 
-                {c.stage === 'Intake' ? (
+                {c.stage === 'Applied' ? (
                     <div style={{ padding: '1rem', background: 'var(--bg-subtle)', borderRadius: '8px' }}>
                         <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Position Applied:</p>
                         <p style={{ fontWeight: 700, color: 'var(--accent-blue)' }}>{c.positionApplied || 'General Role'}</p>

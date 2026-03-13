@@ -17,6 +17,7 @@ import CandidateAssessmentPortal from './pages/CandidateAssessmentPortal';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import CandidatesList from './pages/CandidatesList';
+import HiringPipeline from './pages/HiringPipeline';
 import GeneralSettings from './pages/GeneralSettings';
 import SmtpSettingsPage from './pages/SmtpSettingsPage';
 import TemplateSettingsPage from './pages/TemplateSettingsPage';
@@ -60,6 +61,12 @@ function App() {
                                 </ProtectedRoute>
                             } />
 
+                            <Route path="/admin/pipeline" element={
+                                <ProtectedRoute>
+                                    <HiringPipeline />
+                                </ProtectedRoute>
+                            } />
+
                             <Route path="/admin/jobs" element={
                                 <ProtectedRoute>
                                     <JobManager />
@@ -87,24 +94,6 @@ function App() {
                             <Route path="/admin/settings" element={
                                 <ProtectedRoute>
                                     <Settings />
-                                </ProtectedRoute>
-                            } />
-
-                            <Route path="/admin/settings/general" element={
-                                <ProtectedRoute>
-                                    <GeneralSettings />
-                                </ProtectedRoute>
-                            } />
-
-                            <Route path="/admin/settings/smtp" element={
-                                <ProtectedRoute>
-                                    <SmtpSettingsPage />
-                                </ProtectedRoute>
-                            } />
-
-                            <Route path="/admin/settings/templates" element={
-                                <ProtectedRoute>
-                                    <TemplateSettingsPage />
                                 </ProtectedRoute>
                             } />
 

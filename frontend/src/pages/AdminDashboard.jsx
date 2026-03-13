@@ -55,8 +55,8 @@ export default function AdminDashboard() {
     const stats = [
         { title: 'Total Applicants', value: candidates.length, icon: Users, color: '#3b82f6' },
         { title: 'Active Jobs', value: jobs.filter(j => j.status === 'Active').length, icon: Briefcase, color: '#10b981' },
-        { title: 'Screening Flow', value: candidates.filter(c => c.stage !== 'Evaluated').length, icon: TrendingUp, color: '#8b5cf6' },
-        { title: 'Evaluated', value: candidates.filter(c => c.stage === 'Evaluated').length, icon: CheckCircle2, color: '#f59e0b' }
+        { title: 'Screening Flow', value: candidates.filter(c => c.stage !== 'Assessment Completed').length, icon: TrendingUp, color: '#8b5cf6' },
+        { title: 'Evaluated', value: candidates.filter(c => c.stage === 'Assessment Completed').length, icon: CheckCircle2, color: '#f59e0b' }
     ];
 
     const exportToExcel = () => {
@@ -148,8 +148,8 @@ export default function AdminDashboard() {
                                             fontWeight: 800,
                                             padding: '0.25rem 0.6rem',
                                             borderRadius: '6px',
-                                            background: c.stage === 'Evaluated' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                                            color: c.stage === 'Evaluated' ? '#10b981' : '#3b82f6'
+                                            background: c.stage === 'Assessment Completed' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                                            color: c.stage === 'Assessment Completed' ? '#10b981' : '#3b82f6'
                                         }}>
                                             {c.stage?.toUpperCase()}
                                         </span>

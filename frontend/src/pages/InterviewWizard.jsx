@@ -29,7 +29,7 @@ export default function InterviewWizard() {
         ethicalStressed: 50,
         evaluatorNotes: '',
         scenarioSelection: 'Zero-Day Deployment',
-        stage: 'Evaluated'
+        stage: 'Assessment Completed'
     });
 
     const handleChange = (e) => {
@@ -204,7 +204,7 @@ export default function InterviewWizard() {
                             <div className="form-group" style={{ marginTop: '2rem' }}>
                                 <label className="saas-label">Overall Evaluation Status</label>
                                 <select name="stage" className="saas-input" value={formData.stage} onChange={handleChange}>
-                                    <option value="Evaluated">Standard Approval</option>
+                                    <option value="Assessment Completed">Standard Approval</option>
                                     <option value="Hold">Pending Secondary Review</option>
                                     <option value="Flagged">High Risk / Investigation Required</option>
                                 </select>

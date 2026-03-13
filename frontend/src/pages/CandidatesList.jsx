@@ -8,9 +8,13 @@ import {
 import axios from 'axios';
 
 const STATUS_COLORS = {
-    'Intake': { bg: 'rgba(59,130,246,0.1)', text: '#3b82f6', dot: '#3b82f6' },
-    'Evaluated': { bg: 'rgba(16,185,129,0.1)', text: '#10b981', dot: '#10b981' },
-    'Interview Scheduled': { bg: 'rgba(139,92,246,0.1)', text: '#8b5cf6', dot: '#8b5cf6' },
+    'Applied': { bg: 'rgba(59,130,246,0.1)', text: '#3b82f6', dot: '#3b82f6' },
+    'Assessment Completed': { bg: 'rgba(16,185,129,0.1)', text: '#10b981', dot: '#10b981' },
+    'Shortlisted': { bg: 'rgba(139,92,246,0.1)', text: '#8b5cf6', dot: '#8b5cf6' },
+    'Interview Scheduled': { bg: 'rgba(245,158,11,0.1)', text: '#f59e0b', dot: '#f59e0b' },
+    'Interview Completed': { bg: 'rgba(99,102,241,0.1)', text: '#6366f1', dot: '#6366f1' },
+    'Offer Sent': { bg: 'rgba(236,72,153,0.1)', text: '#ec4899', dot: '#ec4899' },
+    'Hired': { bg: 'rgba(16,185,129,0.2)', text: '#10b981', dot: '#10b981' },
     'Rejected': { bg: 'rgba(239,68,68,0.1)', text: '#ef4444', dot: '#ef4444' },
     'default': { bg: 'rgba(100,116,139,0.1)', text: '#94a3b8', dot: '#94a3b8' }
 };
@@ -59,7 +63,7 @@ export default function CandidatesList() {
         fetchCandidates();
     }, []);
 
-    const stages = ['All', 'Intake', 'Evaluated', 'Interview Scheduled', 'Rejected'];
+    const stages = ['All', 'Applied', 'Assessment Completed', 'Shortlisted', 'Interview Scheduled', 'Interview Completed', 'Offer Sent', 'Hired', 'Rejected'];
 
     const filtered = candidates.filter(c => {
         const matchesSearch =

@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { ingestCandidate, getAllCandidates, getCandidateById, intakeCandidate, performCVAnalysis, submitTechnicalAssessment } = require('../controllers/candidateController');
+const { ingestCandidate, getAllCandidates, getCandidateById, intakeCandidate, performCVAnalysis, submitTechnicalAssessment, updateCandidateStage } = require('../controllers/candidateController');
 
 router.post('/ingest', ingestCandidate);
 router.post('/:id/ingest', ingestCandidate);
 router.post('/intake', intakeCandidate);
 router.post('/:id/analyze', performCVAnalysis);
 router.post('/:id/submit-tech', submitTechnicalAssessment);
+router.patch('/:id/stage', updateCandidateStage);
 router.get('/', getAllCandidates);
 router.get('/:id', getCandidateById);
 

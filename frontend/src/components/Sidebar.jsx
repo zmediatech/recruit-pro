@@ -45,7 +45,11 @@ export default function Sidebar() {
                         </NavLink>
                         <NavLink to="/admin/candidates" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                             <Users size={18} />
-                            <span>Candidates</span>
+                            <span>Candidates List</span>
+                        </NavLink>
+                        <NavLink to="/admin/pipeline" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                            <LayoutDashboard size={18} />
+                            <span>Hiring Pipeline</span>
                         </NavLink>
                         <NavLink to="/admin/jobs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                             <Briefcase size={18} />

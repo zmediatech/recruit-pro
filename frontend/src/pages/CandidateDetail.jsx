@@ -327,7 +327,7 @@ export default function CandidateDetail() {
                             </span>
                             <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--glass-border)' }} />
                             <span style={{ fontSize: '0.8rem', color: 'var(--accent-blue)', fontWeight: 700 }}>
-                                {stage?.toUpperCase() || 'EVALUATED'}
+                                {stage?.toUpperCase() || 'APPLIED'}
                             </span>
                         </div>
                         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
